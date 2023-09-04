@@ -18,6 +18,7 @@ import webbrowser
 from display_image import *
 from time import sleep
 import os
+import network
 
 # Buttons on Adafruit display
 from gpiozero import Button
@@ -39,11 +40,15 @@ search_phrase = ""
 files = []
 image_path = ""
 
+mode = "RECOGNISE"
+
 def doit():
     global search_phrase
     global image_path
     global files
     global image_no
+
+    print("doit")
 
     # Listen for utterances
     displayText("Say something")
@@ -78,6 +83,7 @@ def doit():
 
 # Show image and move number to next image
 def showImage():
+    print("showImage")
     global image_path
     global files
     global image_no
@@ -96,9 +102,93 @@ def showImage():
     finally:     
         image_no+=1
 
+def menu():
+    print("menu")
+    draw,image,width,height = getDrawSurface()
+
+    menuText(draw, width, 4, "4. Set Wifi")    
+    menuText(draw, width, 1, "1. Exit menu")    
+
+    # Display image.
+    disp.image(image)
+
+
+def drawSplash():
+    print("draw splash")
+    draw,image,width,height = getDrawSurface()
+
+    draw.text((0, 0), "Ready", font=font, fill=(255, 255, 0))
+    draw.text((0, 30), ssid, font=font, fill=(255, 255, 0))
+    
+    menuText(draw, width, 2, "2. Menu")    
+    menuText(draw, width, 1, "1. Start listening")
+
+    # Display image.
+    disp.image(image)
+
+
+def configWifi():
+    displayText("Please wait...getting config")
+    settings = network.getSettings()
+    print(settings)
+    if type(settings) is str:
+        displayText(settings)
+        sleep(5)
+    else:
+        displayText("Setting" + settings[0] + " " + settings[1])
+        network.setWifi(settings[0], settings[1])
+
+    drawSplash()        
+
+
+def button1():
+    global mode
+    print("button 1 pressed", mode)
+    if mode=="RECOGNISE":
+        doit()
+    elif mode=="MENU":
+        mode = "RECOGNISE"
+        drawSplash()
+
+def button2():
+    global mode
+    print("button 2 pressed", mode)
+    if mode=="RECOGNISE":
+        mode = "MENU"
+        menu()
+
+def button3():
+    global mode
+    print("button 3 pressed", mode)
+    if mode=="RECOGNISE":
+        mode = "MENU" 
+
+def button4():
+    global mode
+    print("button 4 pressed", mode)
+    if mode=="RECOGNISE":
+        showImage() 
+    elif mode=="MENU":
+        configWifi()
+        mode = "RECOGNISE"
+
 # Set up button handlers
-b1.when_pressed = doit
-b4.when_pressed = showImage
+b1.when_pressed = button1
+b2.when_pressed = button2
+b3.when_pressed = button3
+b4.when_pressed = button4
+
+
+
+ssid = network.getSSID()
+print(ssid)
+
+
+drawSplash()
+
+#network.setWifi("LCM5G", "htmbwsptbwy130")
+
+
 
 # Loop forever
 while True:

@@ -67,6 +67,11 @@ def displayText(text):
     # Display image.
     disp.image(image)
 
+def menuText(draw, width, pos, text):
+    (font_width, font_height) = font.getsize(text)
+    draw.text((width-font_width, 210-((pos-1)*60)), text, font=font, fill=(255, 255, 0))
+
+
 # Display image on screen
 def displayImage(image_name):
     
