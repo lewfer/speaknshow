@@ -224,11 +224,12 @@ def updateSoftware():
             showLongMessageForAWhile("Restart device for new software to run")
     showMainMenu()
 
-def proceed():
-    pass
-
-def cancel():
-    pass
+def rebootDevice():
+    global lastError
+    if showConfirmMenu(["Reboot device?"]):
+        print("Reboot")
+        showLongMessageForAWhile(["Rebooting"])
+        network.reboot()
 
 # Main program
 # ----------------------------------------------------------------
@@ -240,7 +241,7 @@ splashMenu = [("Startup", startup),
              ]
 
 mainMenu = [(None,None),
-            (None,None),
+            ("Reboot",rebootDevice),
             ("Settings", showSettingsMenu),
             ("Listen", listen)]
 

@@ -106,3 +106,7 @@ def updateSoftwareFromGuthub():
         return ("Failed ", process.stderr[:15])
     else:
         return ("Updated", None)
+    
+
+def reboot():
+    os.system('sudo reboot now')

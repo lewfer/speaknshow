@@ -5,8 +5,7 @@ echo "Speaknshow started at ${DATE}" > ~/voiceimage_startup.txt
 #sleep 60
 
 cd /home/pi/speaknshow
-#python3 voiceimage.py & >> ~/voiceimage_startup.txt 2> ~/voiceimage_startup_err.txt
-
+# The export line ensures the sound device works
 export XDG_RUNTIME_DIR="/run/user/1000"
 python3 speaknshow.py
 
