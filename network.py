@@ -93,3 +93,16 @@ def getSettings():
         return "Invalid wifi.txt config file"
 
     return (lines[0].strip(), lines[1].strip())
+
+def updateSoftwareFromGuthub():
+    process = subprocess.run('/home/pi/update_from_github.sh',
+                                    shell=True,
+                                    stdout=subprocess.PIPE, 
+                                    stderr=subprocess.PIPE,
+                                    universal_newlines=True)
+    print("Stdout\n", process.stdout)
+    print("Stderr\n", process.stderr, len(process.stderr))
+    if len(process.stderr)>0:
+        return ("Failed ", process.stderr[:15])
+    else:
+        return ("Updated", None)

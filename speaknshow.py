@@ -27,7 +27,7 @@ import network
 from display_image import *
 
 # Software version number
-version = "2"
+version = "1"
 
 lastError = "No error"
 
@@ -205,8 +205,10 @@ def showLastError():
 
 
 def updateSoftware():
-    pass
-
+    global lastError
+    result,lastError = network.updateSoftwareFromGuthub()
+    showLongMessageForAWhile(result)   
+    showMainMenu()
 
 # Main program
 # ----------------------------------------------------------------
