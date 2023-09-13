@@ -88,7 +88,7 @@ def getSettings():
     configFile = mediaDir + dirs[0] + "/wifi.txt"
 
     if not os.path.isfile(configFile):
-       return "No wifi.txt config file found"
+       return "No wifi.txt config file found on SD card " + dirs[0]
            
     # Read config file
     with open(configFile, "r") as conf:

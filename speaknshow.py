@@ -1,5 +1,7 @@
 '''
-Voice to Image for Raspberry Pi
+Speak'n'Show
+
+Voice to Image device for Raspberry Pi
 
 Recognise speech using Google Speech Recognition and then search Bing for matching images
 
@@ -12,25 +14,21 @@ sudo apt install -y python3-pyaudio
 sudo apt-get install flac
 '''
 
+# Google speech recognition
 import speech_recognition as sr
+
+# Bing image downloader
 from bing_image_downloader import downloader
-import webbrowser
-from display_image import *
+
 from time import sleep
 import os
 import network
 
-# Buttons on Adafruit display
-from gpiozero import Button
-b1 = Button(27)
-b2 = Button(23)
-b3 = Button(22)
-b4 = Button(17)
+from display_image import *
 
-# Set up Audio and text recogniser
-r = sr.Recognizer()
-m = sr.Microphone()
-with m as source: r.adjust_for_ambient_noise(source)
+
+r = None
+m = None
 
 IMAGE_SIZE = 600
 
@@ -40,9 +38,33 @@ search_phrase = ""
 files = []
 image_path = ""
 
-mode = "RECOGNISE"
+# Helper functions
+# ----------------------------------------------------------------
 
-def doit():
+
+# Menu handlers
+# ----------------------------------------------------------------
+def settings():
+    print("settings")
+    showMenu(settingsMenu)
+    pass
+
+def startup():
+    global r, m
+
+    try:
+        # Set up Audio and text recogniser
+        r = sr.Recognizer()
+        m = sr.Microphone()
+        with m as source: r.adjust_for_ambient_noise(source)
+    except Exception as e:
+        showLongString(str(e))       
+        return        
+    
+    showMenu(mainMenu)
+    
+def listen():
+    print("listen")
     global search_phrase
     global image_path
     global files
@@ -74,12 +96,20 @@ def doit():
         # Display first image
         showImage()
 
+        b4.when_pressed = showImage
+        b3.when_pressed = None
+        b2.when_pressed = None
+        b1.when_pressed = setMainMenu
+
     except sr.UnknownValueError:
         displayText("Oops! Didn't catch that")
         print("Didn't catch that")
     except sr.RequestError as e:
         displayText("Issue with Google")
         print("Uh oh! Couldn't request results from Google Speech Recognition service; {0}".format(e))
+    except Exception as e:
+        print(str(e))
+        showLongString(str(e))   
 
 # Show image and move number to next image
 def showImage():
@@ -102,93 +132,32 @@ def showImage():
     finally:     
         image_no+=1
 
-def menu():
-    print("menu")
-    draw,image,width,height = getDrawSurface()
-
-    menuText(draw, width, 4, "4. Set Wifi")    
-    menuText(draw, width, 1, "1. Exit menu")    
-
-    # Display image.
-    disp.image(image)
-
-
-def drawSplash():
-    print("draw splash")
-    draw,image,width,height = getDrawSurface()
-
-    draw.text((0, 0), "Ready", font=font, fill=(255, 255, 0))
-    draw.text((0, 30), ssid, font=font, fill=(255, 255, 0))
-    
-    menuText(draw, width, 2, "2. Menu")    
-    menuText(draw, width, 1, "1. Start listening")
-
-    # Display image.
-    disp.image(image)
-
-
 def configWifi():
-    displayText("Please wait...getting config")
-    settings = network.getSettings()
-    print(settings)
-    if type(settings) is str:
-        displayText(settings)
-        sleep(5)
-    else:
-        displayText("Setting" + settings[0] + " " + settings[1])
-        network.setWifi(settings[0], settings[1])
+    pass
 
-    drawSplash()        
+def setMainMenu():
+    showMenu(mainMenu)
 
 
-def button1():
-    global mode
-    print("button 1 pressed", mode)
-    if mode=="RECOGNISE":
-        doit()
-    elif mode=="MENU":
-        mode = "RECOGNISE"
-        drawSplash()
+# Main program
+# ----------------------------------------------------------------
 
-def button2():
-    global mode
-    print("button 2 pressed", mode)
-    if mode=="RECOGNISE":
-        mode = "MENU"
-        menu()
+splashMenu = [(None,None),
+            (None,None),
+            (None,None),
+            ("Startup", startup)]
 
-def button3():
-    global mode
-    print("button 3 pressed", mode)
-    if mode=="RECOGNISE":
-        mode = "MENU" 
+mainMenu = [(None,None),
+            (None,None),
+            ("Settings", settings),
+            ("Listen", listen)]
 
-def button4():
-    global mode
-    print("button 4 pressed", mode)
-    if mode=="RECOGNISE":
-        showImage() 
-    elif mode=="MENU":
-        configWifi()
-        mode = "RECOGNISE"
+settingsMenu = [(None,None),
+                (None,None),
+                ("Configure Wifi", configWifi),
+                ("Exit menu", setMainMenu)]
 
-# Set up button handlers
-b1.when_pressed = button1
-b2.when_pressed = button2
-b3.when_pressed = button3
-b4.when_pressed = button4
-
-
-
-ssid = network.getSSID()
-print(ssid)
-
-
-drawSplash()
-
-#network.setWifi("LCM5G", "htmbwsptbwy130")
-
-
+showMenu(splashMenu, ["Ready"])
 
 # Loop forever
 while True:

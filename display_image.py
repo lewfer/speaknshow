@@ -6,6 +6,13 @@ import board
 from PIL import Image, ImageDraw, ImageFont
 from adafruit_rgb_display import ili9341
 
+# Buttons on Adafruit display
+from gpiozero import Button
+b1 = Button(27)
+b2 = Button(23)
+b3 = Button(22)
+b4 = Button(17)
+
 # Configuration for CS and DC pins (these are PiTFT defaults):
 cs_pin = digitalio.DigitalInOut(board.CE0)
 dc_pin = digitalio.DigitalInOut(board.D25)
@@ -67,10 +74,13 @@ def displayText(text):
     # Display image.
     disp.image(image)
 
+def drawTextAt(draw, x, y, text):
+    (font_width, font_height) = font.getsize(text)
+    draw.text((x, y), text, font=font, fill=(255, 255, 0))
+
 def menuText(draw, width, pos, text):
     (font_width, font_height) = font.getsize(text)
     draw.text((width-font_width, 210-((pos-1)*60)), text, font=font, fill=(255, 255, 0))
-
 
 # Display image on screen
 def displayImage(image_name):
@@ -98,3 +108,37 @@ def displayImage(image_name):
     # Display image.
     disp.image(image)
 
+def showMenu(menu, additionalText=None):
+    draw,image,width,height = getDrawSurface()
+   
+    # Show menu text
+    if menu[0][0] != None:
+        menuText(draw, width, 4, menu[0][0]+" >")      
+    if menu[1][0] != None:
+        menuText(draw, width, 3, menu[1][0]+" >")       
+    if menu[2][0] != None:
+        menuText(draw, width, 2, menu[2][0]+" >")         
+    if menu[3][0] != None:
+        menuText(draw, width, 1, menu[3][0]+" >")
+
+    if additionalText != None:
+        pos = 0
+        for text in additionalText:
+            drawTextAt(draw, 0, pos, text)
+            pos += 30
+
+    # Set up button handlers
+    b4.when_pressed = menu[0][1]
+    b3.when_pressed = menu[1][1]
+    b2.when_pressed = menu[2][1]
+    b1.when_pressed = menu[3][1]
+                                  
+    disp.image(image)
+
+def showLongString(ex):
+    draw,image,width,height = getDrawSurface()
+    draw.text((0, 0), ex[:20], font=font, fill=(255, 255, 0))  
+    draw.text((0, 30), ex[20:40], font=font, fill=(255, 255, 0))  
+    draw.text((0, 60), ex[40:60], font=font, fill=(255, 255, 0))  
+    draw.text((0, 90), ex[60:], font=font, fill=(255, 255, 0))    
+    disp.image(image)    
