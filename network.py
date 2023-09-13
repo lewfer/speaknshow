@@ -110,3 +110,6 @@ def updateSoftwareFromGuthub():
 
 def reboot():
     os.system('sudo reboot now')
+
+def shutdown():
+    os.system('sudo showdown now')

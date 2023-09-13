@@ -66,7 +66,7 @@ def showSplashMenu():
 # Show the settings menu
 def showSettingsMenu():
     print("settings")
-    showMenu(settingsMenu)
+    showMenu(settingsMenu, ["Settings"])
 
 # message is a list
 def showConfirmMenu(message):
@@ -76,6 +76,11 @@ def showConfirmMenu(message):
         button = waitForButton()
     return button==2
 
+# Show the shutdown menu
+def showShutdownMenu():
+    global lastError
+
+    showMenu(shutdownMenu, ["Shutdown"])
 
 
 
@@ -228,8 +233,30 @@ def rebootDevice():
     global lastError
     if showConfirmMenu(["Reboot device?"]):
         print("Reboot")
-        showLongMessageForAWhile(["Rebooting"])
+        showLongMessageForAWhile("Rebooting...")
         network.reboot()
+    else:
+        showMainMenu()
+
+def shutdownDevice():
+    global lastError
+    if showConfirmMenu(["Shudown device?"]):
+        print("Shutdown")
+        showLongMessageForAWhile("Shutting down...")
+        network.shutdown()
+    else:
+        showMainMenu()        
+
+def exitProgram():
+    global lastError
+    if showConfirmMenu(["Exit program?"]):
+        print("Exit")
+        showLongMessageForAWhile("Exiting...")
+        displayText("Program closed")
+        exit()
+    else:
+        showMainMenu()     
+
 
 # Main program
 # ----------------------------------------------------------------
@@ -241,20 +268,24 @@ splashMenu = [("Startup", startup),
              ]
 
 mainMenu = [(None,None),
-            ("Reboot",rebootDevice),
+            ("Shutdown",showShutdownMenu),
             ("Settings", showSettingsMenu),
             ("Listen", listen)]
 
 settingsMenu = [("Last error", showLastError),
                 ("Update software", updateSoftware),
                 ("Configure Wifi", configWifi),
-                ("Exit menu", showMainMenu)]
+                ("Cancel", showMainMenu)]
 
 confirmMenu = [(None, None),
               (None,None),
               ("Proceed",None),
-              ("Cancel",None)
-             ]
+              ("Cancel",None)]
+
+shutdownMenu = [("Exit program", exitProgram),
+              ("Shutdown",shutdownDevice),
+              ("Reboot",rebootDevice),
+              ("Cancel",showMainMenu)]
 
 showSplashMenu()
 
