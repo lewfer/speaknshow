@@ -27,7 +27,7 @@ import network
 from display_image import *
 
 # Software version number
-version = "2"
+version = "3"
 
 lastError = "No error"
 
@@ -55,7 +55,7 @@ def showMainMenu():
 
     ssid,lastError = network.getSSID()
     #if err==None:
-    showMenu(mainMenu, ["Ready", ssid])
+    showMenu(mainMenu, ["Ready", "V"+version, ssid])
     #else:
     #    showLongString(err)       
 
