@@ -27,7 +27,7 @@ import network
 from display_image import *
 
 # Software version number
-version = "3"
+version = "4"
 
 lastError = "No error"
 
@@ -217,8 +217,11 @@ def updateSoftware():
     global lastError
     if showConfirmMenu(["Update software?"]):
         print("Update")
+        displayText("Updating software")
         result,lastError = network.updateSoftwareFromGuthub()
-        showLongMessageForAWhile(result)   
+        showLongMessageForAWhile(result)
+        if lastError is None:
+            showLongMessageForAWhile("Restart device for new software to run")
     showMainMenu()
 
 def proceed():
