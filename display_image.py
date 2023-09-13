@@ -58,7 +58,7 @@ def getDrawSurface():
 
     return (draw,image,width,height)
 
-# Display text on screen
+# Display text centred on screen
 def displayText(text):
     draw,image,width,height = getDrawSurface()
 
@@ -74,10 +74,23 @@ def displayText(text):
     # Display image.
     disp.image(image)
 
+# Display a list of text on the screen
+def displayTextList(textList):
+    draw,image,width,height = getDrawSurface()
+
+    pos = 0
+    for text in textList:
+        drawTextAt(draw, 0, pos, text)
+        pos += 30
+           
+    disp.image(image)
+
+# Draw text at a given position
 def drawTextAt(draw, x, y, text):
     (font_width, font_height) = font.getsize(text)
     draw.text((x, y), text, font=font, fill=(255, 255, 0))
 
+# Draw a menu item next to the button at position pos
 def menuText(draw, width, pos, text):
     (font_width, font_height) = font.getsize(text)
     draw.text((width-font_width, 210-((pos-1)*60)), text, font=font, fill=(255, 255, 0))
@@ -108,6 +121,7 @@ def displayImage(image_name):
     # Display image.
     disp.image(image)
 
+# Show the menu (which is a list of menu items) and any additional text
 def showMenu(menu, additionalText=None):
     draw,image,width,height = getDrawSurface()
    
@@ -135,10 +149,34 @@ def showMenu(menu, additionalText=None):
                                   
     disp.image(image)
 
-def showLongString(ex):
-    draw,image,width,height = getDrawSurface()
-    draw.text((0, 0), ex[:20], font=font, fill=(255, 255, 0))  
-    draw.text((0, 30), ex[20:40], font=font, fill=(255, 255, 0))  
-    draw.text((0, 60), ex[40:60], font=font, fill=(255, 255, 0))  
-    draw.text((0, 90), ex[60:], font=font, fill=(255, 255, 0))    
-    disp.image(image)    
+# Split string into list of chunks of given size
+def splitn(string, size):
+    result = []
+
+    while len(string)>0:
+        if len(string)>size:
+            result.append(string[:size])
+            string = string[size:]
+        else:
+            result.append(string)
+            string = ""
+    return result
+
+# Show a long string split up 
+def showLongString(ex, lastLine=None):
+    if ex==None:
+        splitup = ["Nothing to show"]
+    else:
+        splitup = splitn(ex, 25)
+
+    if lastLine!=None:
+        splitup.append(lastLine)
+    displayTextList(splitup)
+
+# Clear the button handlers
+def clearMenu():
+    # Set up button handlers
+    b4.when_pressed = None
+    b3.when_pressed = None
+    b2.when_pressed = None
+    b1.when_pressed = None
