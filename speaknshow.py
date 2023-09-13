@@ -27,7 +27,7 @@ import network
 from display_image import *
 
 # Software version number
-version = "1"
+version = "2"
 
 lastError = "No error"
 
@@ -67,6 +67,15 @@ def showSplashMenu():
 def showSettingsMenu():
     print("settings")
     showMenu(settingsMenu)
+
+# message is a list
+def showConfirmMenu(message):
+    showMenu(confirmMenu, message)
+    button = 0
+    while button!=1 and button!=2:
+        button = waitForButton()
+    return button==2
+
 
 
 
@@ -206,9 +215,17 @@ def showLastError():
 
 def updateSoftware():
     global lastError
-    result,lastError = network.updateSoftwareFromGuthub()
-    showLongMessageForAWhile(result)   
+    if showConfirmMenu(["Update software?"]):
+        print("Update")
+        result,lastError = network.updateSoftwareFromGuthub()
+        showLongMessageForAWhile(result)   
     showMainMenu()
+
+def proceed():
+    pass
+
+def cancel():
+    pass
 
 # Main program
 # ----------------------------------------------------------------
@@ -228,6 +245,12 @@ settingsMenu = [("Last error", showLastError),
                 ("Update software", updateSoftware),
                 ("Configure Wifi", configWifi),
                 ("Exit menu", showMainMenu)]
+
+confirmMenu = [(None, None),
+              (None,None),
+              ("Proceed",None),
+              ("Cancel",None)
+             ]
 
 showSplashMenu()
 

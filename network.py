@@ -1,6 +1,6 @@
 # Functions to handle the network
 
-from subprocess import check_output
+from subprocess import check_output, run, PIPE
 import os
 
 # Get the current ssid
@@ -95,10 +95,10 @@ def getSettings():
     return (lines[0].strip(), lines[1].strip())
 
 def updateSoftwareFromGuthub():
-    process = subprocess.run('/home/pi/update_from_github.sh',
+    process = run('/home/pi/update_from_github.sh',
                                     shell=True,
-                                    stdout=subprocess.PIPE, 
-                                    stderr=subprocess.PIPE,
+                                    stdout=PIPE, 
+                                    stderr=PIPE,
                                     universal_newlines=True)
     print("Stdout\n", process.stdout)
     print("Stderr\n", process.stderr, len(process.stderr))

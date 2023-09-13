@@ -6,6 +6,8 @@ import board
 from PIL import Image, ImageDraw, ImageFont
 from adafruit_rgb_display import ili9341
 
+from time import sleep
+
 # Buttons on Adafruit display
 from gpiozero import Button
 b1 = Button(27)
@@ -180,3 +182,15 @@ def clearMenu():
     b3.when_pressed = None
     b2.when_pressed = None
     b1.when_pressed = None
+
+def waitForButton():
+    while True:
+        if b1.is_pressed:
+            return 1
+        elif b2.is_pressed:
+            return 2
+        elif b3.is_pressed:
+            return 3
+        elif b4.is_pressed:
+            return 4
+        sleep(0.2)
